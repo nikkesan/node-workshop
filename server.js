@@ -1,11 +1,41 @@
 var http = require('http');
+var fs = require('fs');
+
+function handler(request, response) {
+  if (endpoint === '/') {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    fs.readFile(__dirname + '/public/index.html', function (error, file) {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      response.end(file);
+    });
+  }
+}
 
 var message = 'I am so happy to be part of the Node Girls workshop';
 
 function handler(request, response) {
-  response.writeHead(200, { 'Content-Type': 'text/html' });
-  response.write(message);
-  response.end();
+  var endpoint = request.url;
+  console.log(endpoint);
+
+  var method = request.method;
+  console.log(method);
+
+  if (endpoint === '/node') {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.write("This is the node page");
+    response.end();
+  } else if (endpoint === '/girls') {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.write("This is the girls page");
+    response.end();
+  } else {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.write(message);
+    response.end();
+  }
 }
 
 var server = http.createServer(handler);
