@@ -1,7 +1,33 @@
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-function handler(request, response) {
+const handlePublic = (request, response, endpoint) => {
+  const extension = endpoint.split('.')[1];
+  const extensionType = {
+    html: "text/html",
+    css: "text/css",
+    js: "application/js",
+    ico: "image/x-icon",
+    jpg: "image/jpeg",
+    png: "image/png"
+  };
+  fs.readFile(__dirname + '/public/' + endpoint, (error, file) => {
+    if (error) {
+      console.log(error);
+      response.writeHead(404, { 'Content-Type': 'text/html' });
+      response.end('<h1>404 not found</h1>')
+    } else {
+      response.writeHead(200, { 'Content-Type': extensionType[extension] });
+      response.end(file);
+    }
+  });
+}
+
+const handler = (request, response) => {
+  const endpoint = request.url;
+  const method = request.method;
+
   if (endpoint === '/') {
     response.writeHead(200, { 'Content-Type': 'text/html' });
     fs.readFile(__dirname + '/public/index.html', function (error, file) {
@@ -11,19 +37,7 @@ function handler(request, response) {
       }
       response.end(file);
     });
-  }
-}
-
-var message = 'I am so happy to be part of the Node Girls workshop';
-
-function handler(request, response) {
-  var endpoint = request.url;
-  console.log(endpoint);
-
-  var method = request.method;
-  console.log(method);
-
-  if (endpoint === '/node') {
+  } else if (endpoint === '/node') {
     response.writeHead(200, { 'Content-Type': 'text/html' });
     response.write("This is the node page");
     response.end();
@@ -31,16 +45,17 @@ function handler(request, response) {
     response.writeHead(200, { 'Content-Type': 'text/html' });
     response.write("This is the girls page");
     response.end();
+  } else if (!endpoint.startsWith('public')) {
+    handlePublic(request, response, endpoint);
   } else {
     response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.write(message);
+    response.write('I am so happy to be part of the Node Girls workshop');
     response.end();
   }
 }
 
-var server = http.createServer(handler);
+const server = http.createServer(handler);
 
-server.listen(3000, function () {
+server.listen(3000, () => {
   console.log("Server is listening on port 3000. Ready to accept requests!");
 });
-
