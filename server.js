@@ -45,12 +45,8 @@ const handler = (request, response) => {
     response.writeHead(200, { 'Content-Type': 'text/html' });
     response.write("This is the girls page");
     response.end();
-  } else if (!endpoint.startsWith('public')) {
-    handlePublic(request, response, endpoint);
   } else {
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.write('I am so happy to be part of the Node Girls workshop');
-    response.end();
+    handlePublic(request, response, endpoint);
   }
 }
 
